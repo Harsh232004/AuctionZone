@@ -10,7 +10,7 @@ const Login: React.FC = () => {
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-blue-700">Welcome Back</h2>
-          <p className="mt-2 text-gray-600">Login to your VintageValue account</p>
+          <p className="mt-2 text-gray-600">Login to AuctionZone</p>
         </div>
         <form className="space-y-6">
           <div>

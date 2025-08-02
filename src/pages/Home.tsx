@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaArrowLeft,
@@ -162,7 +162,7 @@ const SideLoginPanel = () => {
   );
 };
 
-// Slider
+// Slider content and animations
 const sliderContent = [
   {
     pill: "Why Choose AuctionZone?",
@@ -207,6 +207,7 @@ const cardContainerVariants = {
 
 const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const location = useLocation();
 
   useEffect(() => {
     const timer = setInterval(
@@ -215,6 +216,19 @@ const Home: React.FC = () => {
     );
     return () => clearInterval(timer);
   }, []);
+
+  // --- Scroll to section for #upcoming or #trending on URL hash change
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      const elem = document.getElementById(id);
+      if (elem) {
+        setTimeout(() => {
+          elem.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100); // short delay for rendering
+      }
+    }
+  }, [location]);
 
   const nextSlide = () =>
     setCurrentSlide((prev) => (prev + 1) % sliderContent.length);
@@ -226,8 +240,8 @@ const Home: React.FC = () => {
   const slide = sliderContent[currentSlide];
 
   return (
-    <main className="bg-gray-50">
-      {/* Hero / Slider */}
+      <main className="bg-gray-50" style={{ marginTop: '-2rem' }}>
+      {/* SLIDER/HERO SECTION - changed */}
       <section className="relative w-full h-[600px] overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-100 to-blue-200">
         <AnimatePresence mode="wait">
           <motion.div
@@ -364,6 +378,7 @@ const Home: React.FC = () => {
 
       {/* UPCOMING ITEMS */}
       <motion.section
+        id="upcoming" // <-- ADD THIS ID!
         className="py-16 px-6 bg-white"
         initial="hidden"
         whileInView="visible"
@@ -389,6 +404,7 @@ const Home: React.FC = () => {
 
       {/* TRENDING NOW */}
       <motion.section
+        id="trending" // <-- ADD THIS ID!
         className="py-16 px-6 container mx-auto"
         initial="hidden"
         whileInView="visible"

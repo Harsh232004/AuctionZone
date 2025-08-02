@@ -3,9 +3,8 @@ import { useLocation } from "react-router-dom";
 
 const SearchResults: React.FC = () => {
   const location = useLocation();
-  const query = new URLSearchParams(location.search).get("q") || ""; // Safely get query
+  const query = new URLSearchParams(location.search).get("q") || ""; 
 
-  // Sample products (replace with API fetch later)
   const allProducts = [
     { id: 1, title: "Vintage Watch", image: "https://cdn.shopify.com/s/files/1/0526/8658/6018/files/Vintage_Watch_Longines_1024x1024.jpg?v=1741170820", currentBid: 150, endsIn: "2 days" },
     { id: 2, title: "Antique Vase", image: "https://studiopot-uh-ree.in/wp-content/uploads/2022/07/IMG_0087-scaled-1.jpg", currentBid: 250, endsIn: "1 day" },
@@ -33,7 +32,7 @@ const SearchResults: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="container mx-auto py-8 space-y-8">
       {results.length === 0 ? (
         <p className="text-gray-600">No products found. Try another search.</p>
       ) : (

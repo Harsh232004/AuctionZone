@@ -4,8 +4,8 @@ import { FiSearch, FiX, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi";
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
-  { to: "/upcoming", label: "Upcoming Auctions" },
-  { to: "/trending", label: "Trending" },
+  { to: "/#upcoming", label: "Upcoming Auctions", sectionId: "upcoming" },
+  { to: "/#trending", label: "Trending", sectionId: "trending" },
   { to: "/about", label: "About Us" },
   { to: "/contact", label: "Contact" },
 ];
@@ -18,11 +18,11 @@ const Header: React.FC = () => {
   const [isMobileNav, setIsMobileNav] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Focus/search accessibility
+  // Search accessibility
   useEffect(() => {
     if (isSearchActive) searchInputRef.current?.focus();
     const handleEsc = (e: KeyboardEvent) =>
-      (e.key === "Escape" && setIsSearchActive(false));
+      e.key === "Escape" && setIsSearchActive(false);
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, [isSearchActive]);
@@ -36,22 +36,59 @@ const Header: React.FC = () => {
     }
   };
 
+  // --- Handle section scrolling for nav links with a sectionId
+  const handleSectionNav = (
+    e: React.MouseEvent,
+    href: string,
+    sectionId?: string
+  ) => {
+    if (sectionId) {
+      e.preventDefault();
+      setIsMobileNav(false);
+      if (location.pathname === "/") {
+        // Already on Home, scroll to section
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Update URL hash for bookmark/history (optional)
+        window.history.replaceState(null, "", href);
+      } else {
+        // Navigate to Home + hash; Home will auto-scroll (handled in Home.tsx)
+        navigate(href);
+      }
+    } else {
+      setIsMobileNav(false);
+    }
+  };
+
+  // --- Render Nav Links with hash section scroll support
   const navLinks = (
     <div className="flex flex-col md:flex-row md:space-x-8 md:py-3">
-      {NAV_LINKS.map(link => (
+      {NAV_LINKS.map((link) => (
         <Link
           key={link.to}
           to={link.to}
-          className={`relative px-3 py-2 rounded text-base font-medium transition-colors
-            ${location.pathname === link.to
-              ? "text-blue-600 bg-blue-50"
-              : "text-gray-600 hover:text-blue-600"}
+          className={`
+            relative px-3 py-2 rounded text-base font-medium transition-colors
+            ${
+              // Color logic: highlight if at route or (for section links) if URL hash matches
+              location.pathname + location.hash === link.to
+                || (link.sectionId &&
+                    location.hash === "#" + link.sectionId &&
+                    location.pathname === "/")
+                ? "text-blue-600 bg-blue-50"
+                : "text-gray-600 hover:text-blue-600"
+            }
           `}
           tabIndex={isMobileNav ? 0 : undefined}
-          onClick={() => setIsMobileNav(false)}
+          onClick={
+            link.sectionId
+              ? (e) => handleSectionNav(e, link.to, link.sectionId)
+              : () => setIsMobileNav(false)
+          }
         >
           {link.label}
-          {location.pathname === link.to && (
+          {((location.pathname + location.hash === link.to) ||
+            (link.sectionId && location.hash === "#" + link.sectionId && location.pathname === "/")) && (
             <span className="absolute left-1/2 bottom-0 -translate-x-1/2 w-2 h-2 bg-blue-600 rounded-full"></span>
           )}
         </Link>
@@ -60,7 +97,7 @@ const Header: React.FC = () => {
   );
 
   return (
-    <header className="bg-white w-full shadow-md sticky top-0 z-30">
+    <header className="bg-white w-full sticky top-0 z-30 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -75,9 +112,9 @@ const Header: React.FC = () => {
           <div className="hidden md:flex items-center space-x-4">
             {/* Search */}
             <div className={`
-              relative bg-white rounded-full shadow-md transition-all duration-300
-              ${isSearchActive ? 'w-72' : 'w-12'}
-            `}>
+                relative bg-white rounded-full shadow-md transition-all duration-300
+                ${isSearchActive ? 'w-72' : 'w-12'}
+              `}>
               <form onSubmit={handleSearchSubmit}>
                 <input
                   ref={searchInputRef}
@@ -119,8 +156,6 @@ const Header: React.FC = () => {
             {/* Cart and Sign in */}
             <Link to="/cart" className="relative text-gray-500 hover:text-blue-600 transition-colors" aria-label="Shopping Cart">
               <FiShoppingCart size={24} />
-              {/* Example badge */}
-              {/*<span className="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full px-1 text-white">3</span>*/}
             </Link>
             <Link to="/login" className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-700 transition-all shadow-sm">
               <FiUser /><span>Sign In</span>
