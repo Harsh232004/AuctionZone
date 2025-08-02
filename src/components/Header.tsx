@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiSearch, FiX, FiShoppingCart, FiUser } from "react-icons/fi";
+import { FiSearch, FiX, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi";
 
-// --- Sample Data ---
 const NAV_LINKS = [
   { to: "/", label: "Home" },
   { to: "/upcoming", label: "Upcoming Auctions" },
@@ -11,19 +10,21 @@ const NAV_LINKS = [
   { to: "/contact", label: "Contact" },
 ];
 
-// --- Header Component ---
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMobileNav, setIsMobileNav] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-focus the input when the search bar becomes active
+  // Focus/search accessibility
   useEffect(() => {
-    if (isSearchActive) {
-      searchInputRef.current?.focus();
-    }
+    if (isSearchActive) searchInputRef.current?.focus();
+    const handleEsc = (e: KeyboardEvent) =>
+      (e.key === "Escape" && setIsSearchActive(false));
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, [isSearchActive]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -35,48 +36,77 @@ const Header: React.FC = () => {
     }
   };
 
+  const navLinks = (
+    <div className="flex flex-col md:flex-row md:space-x-8 md:py-3">
+      {NAV_LINKS.map(link => (
+        <Link
+          key={link.to}
+          to={link.to}
+          className={`relative px-3 py-2 rounded text-base font-medium transition-colors
+            ${location.pathname === link.to
+              ? "text-blue-600 bg-blue-50"
+              : "text-gray-600 hover:text-blue-600"}
+          `}
+          tabIndex={isMobileNav ? 0 : undefined}
+          onClick={() => setIsMobileNav(false)}
+        >
+          {link.label}
+          {location.pathname === link.to && (
+            <span className="absolute left-1/2 bottom-0 -translate-x-1/2 w-2 h-2 bg-blue-600 rounded-full"></span>
+          )}
+        </Link>
+      ))}
+    </div>
+  );
+
   return (
-    <header className="bg-white w-full shadow-md sticky top-0 z-20">
+    <header className="bg-white w-full shadow-md sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* --- Top Row: Logo and Actions --- */}
         <div className="flex items-center justify-between h-20">
-          <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center space-x-3">
-              <img src="/logo.png" alt="AuctionZone Logo" className="h-12 w-auto" />
-              <span className="text-5xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent drop-shadow-[0_2px_4px_rgba(96,165,250,0.3)] select-none">
-                AuctionZone
-              </span>
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            {/* --- Elastic Search Bar --- */}
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3">
+            <img src="/logo.png" alt="AuctionZone logo" className="h-10 w-auto" />
+            <span className="text-2xl md:text-4xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              AuctionZone
+            </span>
+          </Link>
+
+          {/* Desktop nav & actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            {/* Search */}
             <div className={`
-              relative bg-white rounded-full shadow-md transition-all duration-500 ease-elastic
+              relative bg-white rounded-full shadow-md transition-all duration-300
               ${isSearchActive ? 'w-72' : 'w-12'}
             `}>
               <form onSubmit={handleSearchSubmit}>
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="Type to search..."
+                  placeholder="Search auctions..."
+                  aria-label="Search auctions"
+                  aria-hidden={!isSearchActive}
+                  tabIndex={isSearchActive ? 0 : -1}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className={`
                     w-full h-12 pl-12 pr-4 bg-transparent rounded-full outline-none
-                    transition-all duration-500 ease-elastic
-                    ${isSearchActive ? 'opacity-100' : 'opacity-0'}
+                    transition-all duration-300
+                    ${isSearchActive ? 'opacity-100' : 'opacity-0 pointer-events-none'}
                   `}
                 />
               </form>
               <button
-                onClick={() => setIsSearchActive(!isSearchActive)}
+                type="button"
+                onClick={() => setIsSearchActive(a => !a)}
                 className="absolute left-0 top-0 h-12 w-12 flex items-center justify-center text-blue-600"
-                aria-label="Toggle search"
+                aria-label={isSearchActive ? "Close search" : "Open search"}
+                aria-expanded={isSearchActive}
               >
                 <FiSearch size={22} />
               </button>
               {isSearchActive && (
                 <button
+                  type="button"
                   onClick={() => setIsSearchActive(false)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   aria-label="Close search"
@@ -86,41 +116,49 @@ const Header: React.FC = () => {
               )}
             </div>
 
-            <Link to="/cart" className="text-gray-500 hover:text-blue-600 transition-colors">
+            {/* Cart and Sign in */}
+            <Link to="/cart" className="relative text-gray-500 hover:text-blue-600 transition-colors" aria-label="Shopping Cart">
               <FiShoppingCart size={24} />
+              {/* Example badge */}
+              {/*<span className="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full px-1 text-white">3</span>*/}
             </Link>
             <Link to="/login" className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-700 transition-all shadow-sm">
-              <FiUser />
-              <span>Sign In</span>
+              <FiUser /><span>Sign In</span>
             </Link>
           </div>
-        </div>
-        
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent"></div>
 
-        {/* --- Bottom Row: Navigation --- */}
-        <nav className="flex justify-center">
-          <div className="flex space-x-8 py-3">
-            {NAV_LINKS.map(link => (
-              <Link
-                key={link.to}
-                to={link.to}
-                // ✨ SYNTAX ERROR FIXED HERE ✨
-                className={`relative text-base font-medium transition-colors ${
-                  location.pathname === link.to
-                    ? "text-blue-600"
-                    : "text-gray-600 hover:text-blue-600"
-                }`}
-              >
-                {link.label}
-                {location.pathname === link.to && (
-                  <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-2 h-2 bg-blue-600 rounded-full"></span>
-                )}
-              </Link>
-            ))}
+          {/* Mobile Nav Button */}
+          <button
+            className="inline-flex md:hidden p-2 rounded-full text-blue-600 hover:bg-blue-100 focus:outline-none"
+            onClick={() => setIsMobileNav(v => !v)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMobileNav}
+          >
+            <FiMenu size={28} />
+          </button>
+        </div>
+        {/* Divider */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent"></div>
+        {/* NavList (desktop) */}
+        <nav className="hidden md:flex justify-center">{navLinks}</nav>
+      </div>
+      {/* Mobile Nav Overlay */}
+      {isMobileNav && (
+        <nav className="fixed inset-0 bg-black/60 z-40 flex flex-col top-0 left-0 md:hidden transition duration-150">
+          <div className="bg-white p-6 m-3 rounded-lg shadow-xl w-[90vw] max-w-xs">
+            <button
+              className="absolute right-5 top-5 text-gray-600 hover:text-red-600"
+              aria-label="Close menu"
+              onClick={() => setIsMobileNav(false)}
+            >
+              <FiX size={28} />
+            </button>
+            {navLinks}
+            <Link to="/cart" className="block mt-6 text-blue-700" onClick={() => setIsMobileNav(false)}>Cart</Link>
+            <Link to="/login" className="block mt-2 text-blue-700" onClick={() => setIsMobileNav(false)}>Sign In</Link>
           </div>
         </nav>
-      </div>
+      )}
     </header>
   );
 };

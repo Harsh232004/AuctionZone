@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "r
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
+import BlogPage from "./pages/BlogPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import SearchResults from "./pages/SearchResults";
@@ -26,10 +27,10 @@ const App: React.FC = () => (
         <main className="flex-grow container mx-auto py-8">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/blog/:id" element={<BlogPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/search" element={<SearchResults />} />
-            {/* Add other routes here */}
           </Routes>
         </main>
         <Footer />
