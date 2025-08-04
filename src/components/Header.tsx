@@ -18,7 +18,6 @@ const Header: React.FC = () => {
   const [isMobileNav, setIsMobileNav] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Search accessibility
   useEffect(() => {
     if (isSearchActive) searchInputRef.current?.focus();
     const handleEsc = (e: KeyboardEvent) =>
@@ -36,7 +35,6 @@ const Header: React.FC = () => {
     }
   };
 
-  // --- Handle section scrolling for nav links with a sectionId
   const handleSectionNav = (
     e: React.MouseEvent,
     href: string,
@@ -46,13 +44,10 @@ const Header: React.FC = () => {
       e.preventDefault();
       setIsMobileNav(false);
       if (location.pathname === "/") {
-        // Already on Home, scroll to section
         const el = document.getElementById(sectionId);
         if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        // Update URL hash for bookmark/history (optional)
         window.history.replaceState(null, "", href);
       } else {
-        // Navigate to Home + hash; Home will auto-scroll (handled in Home.tsx)
         navigate(href);
       }
     } else {
@@ -60,7 +55,6 @@ const Header: React.FC = () => {
     }
   };
 
-  // --- Render Nav Links with hash section scroll support
   const navLinks = (
     <div className="flex flex-col md:flex-row md:space-x-6">
       {NAV_LINKS.map((link) => (
@@ -95,7 +89,6 @@ const Header: React.FC = () => {
     <header className="bg-white w-full sticky top-0 z-10 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <img src="/logo.png" alt="AuctionZone logo" className="h-9 w-auto" />
             <span className="text-xl md:text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
@@ -103,12 +96,9 @@ const Header: React.FC = () => {
             </span>
           </Link>
 
-          {/* Desktop nav & actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Nav Links */}
             <nav className="flex space-x-4">{navLinks}</nav>
             
-            {/* Search */}
             <div
               className={`
                 relative bg-white rounded-full shadow-sm transition-all duration-300 border border-gray-200
@@ -140,7 +130,6 @@ const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* Cart and Sign in */}
             <Link
               to="/cart"
               className="relative text-gray-500 hover:text-blue-600 transition-colors"
@@ -157,7 +146,6 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Mobile Nav Button */}
           <button
             className="inline-flex md:hidden p-2 rounded-full text-blue-600 hover:bg-blue-100 focus:outline-none"
             onClick={() => setIsMobileNav((v) => !v)}
@@ -168,7 +156,6 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
-      {/* Mobile Nav Overlay */}
       {isMobileNav && (
         <nav className="fixed inset-0 bg-black/60 z-40 flex flex-col top-0 left-0 md:hidden transition duration-150">
           <div className="bg-white p-6 m-3 rounded-lg shadow-xl w-[90vw] max-w-xs">

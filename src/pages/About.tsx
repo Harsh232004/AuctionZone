@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -11,7 +10,6 @@ import {
   FaHandshake 
 } from "react-icons/fa";
 
-// Data for the "Why Choose Us" section
 const features = [
   {
     icon: <FaGavel className="w-8 h-8 text-blue-600" />,
@@ -35,7 +33,6 @@ const features = [
   },
 ];
 
-// New data for the visual "How It Works" guide
 const steps = [
   {
     icon: <FaUserPlus size={32} className="text-blue-500" />,
@@ -61,7 +58,6 @@ const steps = [
 
 const About = () => (
   <main className="bg-white">
-    {/* 1. Immersive Hero Section */}
     <section className="relative h-[400px] bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80')" }}>
       <div className="absolute inset-0 bg-black/60"></div>
       <div className="relative h-full flex flex-col items-center justify-center text-center text-white p-6">
@@ -74,7 +70,6 @@ const About = () => (
       </div>
     </section>
 
-    {/* 2. Modern Features Section */}
     <section className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
@@ -100,7 +95,6 @@ const About = () => (
       </div>
     </section>
 
-    {/* 3. Visual "How It Works" Guide */}
     <section className="py-20">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
@@ -120,7 +114,6 @@ const About = () => (
       </div>
     </section>
 
-    {/* 4. Two-Column Mission Section */}
     <section className="py-20 bg-blue-50">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
@@ -138,7 +131,6 @@ const About = () => (
       </div>
     </section>
     
-    {/* 5. Dedicated Call-to-Action (CTA) */}
     <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <h2 className="text-4xl font-extrabold">Ready to Join the Community?</h2>

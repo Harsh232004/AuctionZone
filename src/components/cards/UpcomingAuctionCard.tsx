@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { FaClock } from "react-icons/fa";
 import type { AuctionItem } from "../../types";
 
-// The card now accepts an `isRight` prop to control its alignment
 const UpcomingAuctionCard = ({ item, isRight = false }: { item: AuctionItem; isRight?: boolean }) => {
   return (
     <div className={`flex items-center w-full ${isRight ? "justify-start" : "justify-end"}`}>
@@ -29,7 +28,6 @@ const UpcomingAuctionCard = ({ item, isRight = false }: { item: AuctionItem; isR
           </div>
         </motion.div>
       </div>
-      {/* Timeline Circle */}
       <div className="absolute left-1/2 -ml-3 z-10 w-6 h-6 bg-blue-500 rounded-full border-4 border-white"></div>
     </div>
   );
