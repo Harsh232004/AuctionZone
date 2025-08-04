@@ -1,13 +1,10 @@
-// src/pages/BlogPage.tsx
 import { useParams } from "react-router-dom";
 import type { BlogPost } from "../types";
 
-// For demo: hardcode your posts array here (move to a central data store in real app)
 const blogPosts: BlogPost[] = [
   { id: 1, title: "How to Win Your First Auction", excerpt: "Essential tips...", link: "/blog/1" },
   { id: 2, title: "The Art of Valuing Antiques", excerpt: "Learn how experts...", link: "/blog/2" },
   { id: 3, title: "Spotlight: Top 5 Sales of 2025", excerpt: "A look back at...", link: "/blog/3" },
-  // Add body/content below in a real app
 ];
 
 const blogContents: { [id: number]: string } = {

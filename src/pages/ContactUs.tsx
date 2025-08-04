@@ -1,9 +1,5 @@
-// src/pages/Contact.tsx
-
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
-// 1. Import map components from react-leaflet
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
 const Contact = () => {
@@ -21,7 +17,6 @@ const Contact = () => {
     }, 1500);
   };
   
-  // Coordinates for Mumbai
   const officePosition: [number, number] = [19.0760, 72.8777];
 
   return (
@@ -37,7 +32,6 @@ const Contact = () => {
       
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left Column: Context and Details */}
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold text-gray-800">Contact Information</h2>
@@ -70,7 +64,6 @@ const Contact = () => {
             </div>
           </div>
           
-          {/* Right Column: Modern Contact Form */}
           <div className="bg-gray-50 p-8 rounded-xl shadow-lg">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Send a Direct Message</h2>
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -115,11 +108,9 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* 2. Updated Map Section with Live Map */}
       <section className="bg-gray-50 py-10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="w-full h-96 bg-gray-300 rounded-xl overflow-hidden shadow-lg">
-            {/* The MapContainer component renders the live map */}
             <MapContainer center={officePosition} zoom={13} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

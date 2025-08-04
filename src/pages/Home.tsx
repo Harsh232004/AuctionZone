@@ -15,7 +15,6 @@ import FeaturedAuctionCard from "../components/cards/FeaturedAuctionCard";
 import UpcomingAuctionCard from "../components/cards/UpcomingAuctionCard";
 import type { AuctionItem, BlogPost } from "../types";
 
-// --- Demo data ---
 const featuredAuctions: AuctionItem[] = [
     { id: 1, title: "Vintage Rolex Watch", image: "https://cdn.shopify.com/s/files/1/0526/8658/6018/files/Vintage_Watch_Longines_1024x1024.jpg?v=1741170820", currentBid: 1500, endsIn: "2 days" },
     { id: 2, title: "Antique Chinese Vase", image: "https://studiopot-uh-ree.in/wp-content/uploads/2022/07/IMG_0087-scaled-1.jpg", currentBid: 250, endsIn: "1 day" },
@@ -30,7 +29,7 @@ const upcomingItems: AuctionItem[] = [
 const trendingItems: AuctionItem[] = [
  {
     id: 8,
-    title: "Classic Comic Collection", // <-- New Item
+    title: "Classic Comic Collection", 
     image: "https://images.unsplash.com/photo-1594347963363-1434f828e434?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80", // <-- New, Stable Link
     currentBid: 2500,
     bids: 45

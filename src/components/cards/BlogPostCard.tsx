@@ -1,4 +1,3 @@
-// src/components/cards/BlogPostCard.tsx
 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -6,7 +5,6 @@ import type { BlogPost } from "../../types";
 
 const BlogPostCard = ({ post }: { post: BlogPost }) => (
   <motion.div
-    // 1. Added a stronger base shadow and a hover shadow effect
     className="bg-gray-200 rounded-xl shadow-xl hover:shadow-2xl 
                transition-shadow duration-300 ease-in-out 
                overflow-hidden group flex flex-col"

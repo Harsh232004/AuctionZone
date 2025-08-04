@@ -9,12 +9,10 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
   };
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-2">
-      {/* 1. Left Column: Image and Branding */}
       <div className="relative hidden lg:block bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1562620479-916758415d8e?ixlib=rb-4.0.3&auto=format&fit=crop&w=987&q=80')" }}>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative h-full flex flex-col justify-end p-12 text-white">
@@ -33,7 +31,6 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Right Column: Login Form */}
       <div className="flex flex-col items-center justify-center bg-gray-50 p-6 sm:p-12">
         <motion.div 
           className="w-full max-w-md"
