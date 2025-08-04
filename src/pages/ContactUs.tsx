@@ -1,127 +1,137 @@
-import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaUser } from "react-icons/fa";
-import { useState } from "react";
+// src/pages/Contact.tsx
+
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+// 1. Import map components from react-leaflet
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
-  // Simulate form submission (replace with real API call in production)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.name || !form.email || !form.message) return;
     setStatus("sending");
     setTimeout(() => {
       setStatus("success");
       setForm({ name: "", email: "", message: "" });
-    }, 1200);
+      setTimeout(() => setStatus("idle"), 5000);
+    }, 1500);
   };
+  
+  // Coordinates for Mumbai
+  const officePosition: [number, number] = [19.0760, 72.8777];
 
   return (
-    <main className="max-w-2xl mx-auto p-6 py-12">
-      <header className="mb-10 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-blue-700 mb-2">
-          Contact Us
-        </h1>
-        <p className="text-lg text-gray-700">
-          Have a question? Need help with an auction or your profile? We’re here for you.
-        </p>
-      </header>
-
-      <section className="mb-10 grid grid-cols-1 sm:grid-cols-2 gap-8">
-        <div className="bg-blue-50 p-6 rounded-xl shadow flex flex-col gap-6">
-          <div className="flex items-center gap-3">
-            <FaEnvelope className="text-blue-600" />
-            <div>
-              <h3 className="font-semibold">Email</h3>
-              <a href="mailto:support@auctionzone.com" className="text-blue-700 hover:underline">
-                support@auctionzone.com
-              </a>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaPhone className="text-blue-600" />
-            <div>
-              <h3 className="font-semibold">Phone</h3>
-              <a href="tel:+18001234567" className="text-blue-700 hover:underline">
-                +1-800-123-4567
-              </a>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <FaMapMarkerAlt className="text-blue-600" />
-            <div>
-              <h3 className="font-semibold">Head Office</h3>
-              <span>123 Marketplace Ave, Mumbai, India</span>
-            </div>
-          </div>
+    <main className="bg-white">
+      <header className="bg-gray-50 py-16 text-center">
+        <div className="max-w-4xl mx-auto px-6">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800">Get in Touch</h1>
+          <p className="mt-4 text-lg text-gray-600">
+            Have a question, feedback, or a partnership inquiry? Our team is ready to help.
+          </p>
         </div>
-        <div>
-          <h2 className="text-xl font-bold mb-4 text-blue-600">Send us a message</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+      </header>
+      
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Left Column: Context and Details */}
+          <div className="space-y-8">
             <div>
-              <label className="sr-only" htmlFor="name">Your Name</label>
-              <div className="flex items-center bg-white rounded-lg px-3">
-                <FaUser className="text-gray-400 mr-2" />
+              <h2 className="text-2xl font-bold text-gray-800">Contact Information</h2>
+              <p className="mt-2 text-gray-600">
+                Fill out the form, and we'll get back to you within 24 business hours. For urgent matters, please use the contact details below.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg">
+                <FaEnvelope className="text-blue-600 w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Email Us</h3>
+                  <a href="mailto:support@auctionzone.com" className="text-blue-700 hover:underline">support@auctionzone.com</a>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg">
+                <FaPhone className="text-blue-600 w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Call Us</h3>
+                  <a href="tel:+18001234567" className="text-blue-700 hover:underline">+1-800-123-4567</a>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg">
+                <FaMapMarkerAlt className="text-blue-600 w-6 h-6 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Our Office</h3>
+                  <p className="text-gray-700">123 Marketplace Ave, Mumbai, India</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Right Column: Modern Contact Form */}
+          <div className="bg-gray-50 p-8 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Send a Direct Message</h2>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="name" className="font-medium text-gray-700">Your Name</label>
                 <input
-                  id="name"
-                  type="text"
-                  placeholder="Your name"
-                  value={form.name}
-                  required
-                  className="w-full py-2 outline-none bg-transparent"
+                  id="name" type="text" placeholder="John Doe" value={form.name} required
+                  className="mt-1 w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 />
               </div>
-            </div>
-            <div>
-              <label className="sr-only" htmlFor="email">Your Email</label>
-              <div className="flex items-center bg-white rounded-lg px-3">
-                <FaEnvelope className="text-gray-400 mr-2" />
+              <div>
+                <label htmlFor="email" className="font-medium text-gray-700">Your Email</label>
                 <input
-                  id="email"
-                  type="email"
-                  placeholder="you@email.com"
-                  value={form.email}
-                  required
-                  className="w-full py-2 outline-none bg-transparent"
+                  id="email" type="email" placeholder="you@example.com" value={form.email} required
+                  className="mt-1 w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
                   onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 />
               </div>
-            </div>
-            <div>
-              <label className="sr-only" htmlFor="message">Message</label>
-              <textarea
-                id="message"
-                placeholder="How can we help you?"
-                value={form.message}
-                minLength={5}
-                required
-                className="w-full h-28 rounded-lg p-3 resize-none outline-none"
-                onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={status === "sending"}
-              className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              {status === "sending" ? "Sending..." : "Send"}
-            </button>
-            {status === "success" && (
-              <div className="text-green-600 text-sm mt-1">Your message was sent! We'll reply by email soon.</div>
-            )}
-            {status === "error" && (
-              <div className="text-red-600 text-sm mt-1">Oops! Something went wrong—please try again.</div>
-            )}
-          </form>
+              <div>
+                <label htmlFor="message" className="font-medium text-gray-700">Message</label>
+                <textarea
+                  id="message" placeholder="How can we help you today?" value={form.message} minLength={10} required
+                  className="mt-1 w-full h-32 p-3 bg-white border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 outline-none transition"
+                  onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                />
+              </div>
+              <button
+                type="submit" disabled={status === "sending"}
+                className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition transform hover:scale-105 shadow-md disabled:bg-blue-400 disabled:cursor-not-allowed"
+              >
+                {status === "sending" ? "Sending..." : "Send Message"}
+              </button>
+              {status === "success" && (
+                <div className="text-center p-3 bg-green-100 text-green-800 rounded-lg">Message sent successfully! We'll be in touch soon.</div>
+              )}
+              {status === "error" && (
+                <div className="text-center p-3 bg-red-100 text-red-800 rounded-lg">Something went wrong. Please try again.</div>
+              )}
+            </form>
+          </div>
         </div>
       </section>
 
-      <section className="mt-8 p-6 bg-gray-50 rounded-xl text-gray-700 text-center">
-        <h2 className="text-xl font-bold text-blue-600 mb-2">Helpdesk Hours:</h2>
-        <div>Monday to Saturday: 9:00am – 9:00pm IST</div>
-        <div>Sunday: 11:00am – 6:00pm IST</div>
-        <div className="mt-3">
-          For support with auctions, account issues, or verification, please email or fill the form above. We respond within 24 hours on business days.
+      {/* 2. Updated Map Section with Live Map */}
+      <section className="bg-gray-50 py-10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="w-full h-96 bg-gray-300 rounded-xl overflow-hidden shadow-lg">
+            {/* The MapContainer component renders the live map */}
+            <MapContainer center={officePosition} zoom={13} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker position={officePosition}>
+                <Popup>
+                  AuctionZone Head Office <br /> 123 Marketplace Ave, Mumbai.
+                </Popup>
+              </Marker>
+            </MapContainer>
+          </div>
         </div>
       </section>
     </main>

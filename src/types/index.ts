@@ -1,4 +1,6 @@
 // src/types/index.ts
+
+// The updated type definition for an auction item
 export interface AuctionItem {
   id: number;
   title: string;
@@ -9,6 +11,8 @@ export interface AuctionItem {
   startsIn?: string;
   bids?: number;
 }
+
+// The updated type definition for a blog post
 export interface BlogPost {
   id: number;
   title: string;
