@@ -6,6 +6,9 @@ import BlogPage from "./pages/BlogPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import SearchResults from "./pages/SearchResults";
+import About from "./pages/About";
+import Contact from "./pages/ContactUs";
+
 
 // Wrapper component to normalize paths to lowercase (handles case-insensitivity)
 const NormalizePath: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -24,9 +27,11 @@ const App: React.FC = () => (
     <NormalizePath>
       <div className="flex flex-col h-screen">
         <Header />
-        <main className="flex-grow container mx-auto py-8">
+        <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />}></Route>
             <Route path="/blog/:id" element={<BlogPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
