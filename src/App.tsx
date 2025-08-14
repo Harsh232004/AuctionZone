@@ -8,6 +8,8 @@ import Register from "./pages/Register";
 import SearchResults from "./pages/SearchResults";
 import About from "./pages/About";
 import Contact from "./pages/ContactUs";
+import PlaceBidPage from './pages/PlaceBidPage';
+import CartPage from './pages/CartPage';
 
 
 // Wrapper component to normalize paths to lowercase (handles case-insensitivity)
@@ -36,6 +38,8 @@ const App: React.FC = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/search" element={<SearchResults />} />
+            <Route path="/item/:id" element={<PlaceBidPage />} /> 
+            <Route path="/cart" element={<CartPage />} /> 
           </Routes>
         </main>
         <Footer />

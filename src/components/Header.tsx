@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiSearch, FiX, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi";
+import { CartContext } from "../context/CartContext";
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
@@ -13,6 +14,7 @@ const NAV_LINKS = [
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { cartItems } = useContext(CartContext);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileNav, setIsMobileNav] = useState(false);
@@ -89,7 +91,6 @@ const Header: React.FC = () => {
     <header className="bg-white w-full sticky top-0 z-10 shadow-md">
       <div className="px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
-          {/* CHANGE: Grouped Logo and Nav into a single flex container to push actions to the far right */}
           <div className="flex items-center space-x-16">
             <Link to="/" className="flex items-center space-x-3">
               <img src="/logo.png" alt="AuctionZone logo" className="h-10 w-auto" />
@@ -102,7 +103,6 @@ const Header: React.FC = () => {
             </div>
           </div>
           
-          {/* Group 3: Actions (Right-aligned) */}
           <div className="hidden md:flex items-center space-x-4">
             <div
               className={`
@@ -135,15 +135,19 @@ const Header: React.FC = () => {
               </button>
             </div>
 
-            {/* CHANGE: Added flex-shrink-0 to prevent this from shrinking */}
             <Link
               to="/cart"
               className="relative text-gray-500 hover:text-blue-600 transition-colors flex-shrink-0"
               aria-label="Shopping Cart"
             >
               <FiShoppingCart size={24} />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartItems.length}
+                </span>
+              )}
             </Link>
-            {/* CHANGE: Added flex-shrink-0 and whitespace-nowrap to fix resizing issue */}
+            
             <Link
               to="/login"
               className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg text-base font-semibold shadow-sm hover:bg-blue-700 transition-all flex-shrink-0"
@@ -153,7 +157,6 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className="inline-flex md:hidden p-2 rounded-full text-blue-600 hover:bg-blue-100 focus:outline-none"
             onClick={() => setIsMobileNav((v) => !v)}
@@ -164,11 +167,75 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
-      {/* Mobile navigation pop-out */}
+
+      {/* THIS IS THE FIXED MOBILE NAVIGATION */}
       {isMobileNav && (
-         <nav className="fixed inset-0 bg-black/60 z-40 flex flex-col top-0 left-0 md:hidden transition duration-150">
-           {/* ... existing mobile nav code ... */}
-         </nav>
+        <div className="fixed inset-0 bg-black/60 z-40 md:hidden">
+          {/* Mobile Menu Panel */}
+          <div className="fixed top-0 right-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <span className="text-xl font-bold text-gray-900">Menu</span>
+              <button
+                onClick={() => setIsMobileNav(false)}
+                className="p-2 rounded-full text-gray-500 hover:bg-gray-100"
+                aria-label="Close menu"
+              >
+                <FiX size={24} />
+              </button>
+            </div>
+
+            {/* Navigation Links */}
+            <nav className="p-6">
+              <div className="space-y-4">
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className="block py-3 px-4 rounded-lg text-lg font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    onClick={
+                      link.sectionId
+                        ? (e) => handleSectionNav(e, link.to, link.sectionId)
+                        : () => setIsMobileNav(false)
+                    }
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+
+            {/* Mobile Actions */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-200 bg-gray-50">
+              <div className="space-y-4">
+                <Link
+                  to="/cart"
+                  className="flex items-center justify-between py-3 px-4 bg-white rounded-lg shadow-sm"
+                  onClick={() => setIsMobileNav(false)}
+                >
+                  <div className="flex items-center space-x-3">
+                    <FiShoppingCart size={20} />
+                    <span className="font-semibold">Watchlist</span>
+                  </div>
+                  {cartItems.length > 0 && (
+                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </Link>
+                
+                <Link
+                  to="/login"
+                  className="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold shadow-sm"
+                  onClick={() => setIsMobileNav(false)}
+                >
+                  <FiUser size={20} />
+                  <span>Sign In</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </header>
   );
