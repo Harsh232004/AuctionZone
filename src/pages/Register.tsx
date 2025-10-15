@@ -1,32 +1,75 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaLock, FaGoogle } from 'react-icons/fa';
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError]           = useState<string | null>(null);
+  const [success, setSuccess]       = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      setError('Passwords do not match');
       return;
     }
-  };
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (!res.ok) {
+        // Try to show server message if provided
+        let msg = `HTTP ${res.status}`;
+        try {
+          const body = await res.json();
+          msg = body?.message || msg;
+        } catch {
+          msg = await res.text().catch(() => msg);
+        }
+        throw new Error(msg || 'Registration failed');
+      }
+
+      // Optional: read response for further info
+      // const data = await res.json();
+
+      setSuccess('Account created successfully! Redirecting to login…');
+      setTimeout(() => navigate('/login'), 900);
+    } catch (err: any) {
+      setError(err?.message ?? 'Something went wrong');
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-2">
-      <div className="relative hidden lg:block bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1521790797524-22028de3aa26?ixlib=rb-4.0.3&auto=format&fit=crop&w=987&q=80')" }}>
+      <div
+        className="relative hidden lg:block bg-cover bg-center"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1521790797524-22028de3aa26?ixlib=rb-4.0.3&auto=format&fit=crop&w=987&q=80')" }}
+      >
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative h-full flex flex-col justify-end p-12 text-white">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
             <h1 className="text-4xl font-bold">
               Join <span className="text-blue-400">AuctionZone</span>
             </h1>
@@ -38,11 +81,11 @@ const Register: React.FC = () => {
       </div>
 
       <div className="flex flex-col items-center justify-center bg-gray-50 p-6 sm:p-12">
-        <motion.div 
+        <motion.div
           className="w-full max-w-md"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         >
           <div className="text-left mb-10">
             <h2 className="text-3xl font-bold text-gray-900">Create an Account</h2>
@@ -55,46 +98,69 @@ const Register: React.FC = () => {
               <div className="relative">
                 <FaUser className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400" />
                 <input
-                  id="username" type="text" placeholder="Choose a username" value={username} required
+                  id="username"
+                  type="text"
+                  placeholder="Choose a username"
+                  value={username}
+                  required
                   className="w-full py-3 pl-12 pr-4 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
                   onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
             </div>
+
             <div>
               <label htmlFor="email" className="sr-only">Email</label>
               <div className="relative">
                 <FaEnvelope className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400" />
                 <input
-                  id="email" type="email" placeholder="you@example.com" value={email} required
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  required
                   className="w-full py-3 pl-12 pr-4 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
+
             <div>
               <label htmlFor="password" className="sr-only">Password</label>
               <div className="relative">
                 <FaLock className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400" />
                 <input
-                  id="password" type="password" placeholder="Create a password" value={password} required
+                  id="password"
+                  type="password"
+                  placeholder="Create a password"
+                  value={password}
+                  required
                   className="w-full py-3 pl-12 pr-4 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
+
             <div>
               <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
               <div className="relative">
                 <FaLock className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400" />
                 <input
-                  id="confirmPassword" type="password" placeholder="Confirm your password" value={confirmPassword} required
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  required
                   className="w-full py-3 pl-12 pr-4 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </div>
             </div>
-            
+
+            {/* Feedback */}
+            {error && <div className="text-red-600 text-sm">{error}</div>}
+            {success && <div className="text-green-600 text-sm">{success}</div>}
+
             <div className="flex items-start gap-3">
               <input type="checkbox" id="terms" required className="mt-1 h-4 w-4 rounded text-blue-600 focus:ring-blue-500" />
               <label htmlFor="terms" className="text-gray-600 text-sm">
@@ -104,9 +170,10 @@ const Register: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition transform hover:scale-105 shadow-md"
+              disabled={submitting}
+              className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition transform hover:scale-105 shadow-md disabled:opacity-60"
             >
-              Create Account
+              {submitting ? 'Creating…' : 'Create Account'}
             </button>
           </form>
 

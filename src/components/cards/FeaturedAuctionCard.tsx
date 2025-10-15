@@ -1,16 +1,25 @@
 // src/components/cards/FeaturedAuctionCard.tsx
-
-import { Link } from 'react-router-dom'; // <-- IMPORT LINK
+import { Link } from 'react-router-dom';
 import { FaUser, FaRegClock, FaGavel } from 'react-icons/fa';
 import type { AuctionItem } from '../../types';
+import { useAuth } from '../../context/AuthContext'; // NEW
 
-interface Props {
+type Props = {
   item: AuctionItem;
-}
+  onPlaceBid?: () => void;
+};
 
-const FeaturedAuctionCard: React.FC<Props> = ({ item }) => {
+const FeaturedAuctionCard: React.FC<Props> = ({ item, onPlaceBid }) => {
+  const { isAuthenticated } = useAuth(); // NEW
+
+  // Prevent the outer Link from navigating when clicking the button
+  const handleBidClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onPlaceBid?.();
+  };
+
   return (
-    // WRAP THE ENTIRE CARD IN A LINK
     <Link to={`/item/${item.id}`} className="block group">
       <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
         <div className="relative">
@@ -20,14 +29,21 @@ const FeaturedAuctionCard: React.FC<Props> = ({ item }) => {
             {item.endsIn}
           </div>
         </div>
+
         <div className="p-4">
-          <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">{item.title}</h3>
+          <h3 className="text-lg font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+            {item.title}
+          </h3>
           <p className="text-sm text-gray-600 truncate">{item.description}</p>
+
           <div className="mt-4 flex justify-between items-center">
             <div>
               <p className="text-xs text-gray-500">Current Bid</p>
-              <p className="text-xl font-bold text-gray-800">${item.currentBid?.toLocaleString()}</p>
+              <p className="text-xl font-bold text-gray-800">
+                ${item.currentBid?.toLocaleString()}
+              </p>
             </div>
+
             <div className="text-right">
               <div className="flex items-center text-sm text-gray-500">
                 <FaGavel className="mr-1" />
@@ -39,6 +55,19 @@ const FeaturedAuctionCard: React.FC<Props> = ({ item }) => {
               </div>
             </div>
           </div>
+
+          {/* Action row: show only if NOT authenticated */}
+          {!isAuthenticated && (
+            <div className="mt-4 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={handleBidClick}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+              >
+                Place Bid
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </Link>
