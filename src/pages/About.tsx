@@ -137,7 +137,7 @@ const About = () => (
         <p className="mt-4 text-lg text-blue-100">Sign up today and start your journey with thousands of collectors and enthusiasts.</p>
         <div className="flex gap-4 mt-8 justify-center flex-wrap">
           <Link to="/register" className="bg-white text-blue-700 font-semibold px-8 py-3 rounded-lg shadow-lg hover:bg-gray-100 transition transform hover:scale-105">Register Now</Link>
-          <Link to="/upcoming" className="bg-transparent border-2 border-white font-semibold px-8 py-3 rounded-lg hover:bg-white/10 transition transform hover:scale-105">See Upcoming Auctions</Link>
+          <Link to="/#upcoming" className="bg-transparent border-2 border-white font-semibold px-8 py-3 rounded-lg hover:bg-white/10 transition transform hover:scale-105">See Upcoming Auctions</Link>
         </div>
       </div>
     </section>

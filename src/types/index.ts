@@ -1,4 +1,3 @@
-
 export interface AuctionItem {
   id: number;
   title: string;
@@ -8,6 +7,8 @@ export interface AuctionItem {
   endsIn?: string;
   startsIn?: string;
   bids?: number;
+  description?: string; 
+  sellerName?: string;
 }
 
 export interface BlogPost {

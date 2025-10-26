@@ -1,29 +1,42 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiSearch, FiX, FiShoppingCart, FiUser, FiMenu } from "react-icons/fi";
+import { useState, useEffect, useRef, useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import {
+  FiSearch,
+  FiShoppingCart,
+  FiUser,
+  FiMenu,
+  FiLogOut,
+  FiChevronDown,
+} from 'react-icons/fi';
+import { CartContext } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
-const NAV_LINKS = [
-  { to: "/", label: "Home" },
-  { to: "/#upcoming", label: "Upcoming Auctions", sectionId: "upcoming" },
-  { to: "/#trending", label: "Trending", sectionId: "trending" },
-  { to: "/about", label: "About Us" },
-  { to: "/contact", label: "Contact" },
+const SERVICE_DROPDOWN = [
+  { to: '/services/live-auctions', label: 'Live Auctions' },
+  { to: '/services/private-bids', label: 'Private Bids' },
+  { to: '/services/upcoming-events', label: 'Upcoming Events' },
+  { to: '/services/auction-management', label: 'Auction Management' },
 ];
 
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { cartItems } = useContext(CartContext);
+  const { isAuthenticated, user, hasRole, logout } = useAuth();
+
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isMobileNav, setIsMobileNav] = useState(false);
+  const [showServicesDropdown, setShowServicesDropdown] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Focus search bar when opened
   useEffect(() => {
     if (isSearchActive) searchInputRef.current?.focus();
-    const handleEsc = (e: KeyboardEvent) =>
-      e.key === "Escape" && setIsSearchActive(false);
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && setIsSearchActive(false);
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [isSearchActive]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -31,22 +44,24 @@ const Header: React.FC = () => {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       setIsSearchActive(false);
-      setSearchQuery("");
+      setSearchQuery('');
     }
   };
 
-  const handleSectionNav = (
-    e: React.MouseEvent,
-    href: string,
-    sectionId?: string
-  ) => {
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+    navigate('/', { replace: true });
+  };
+
+  const handleSectionNav = (e: React.MouseEvent, href: string, sectionId?: string) => {
     if (sectionId) {
       e.preventDefault();
       setIsMobileNav(false);
-      if (location.pathname === "/") {
+      if (location.pathname === '/') {
         const el = document.getElementById(sectionId);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.replaceState(null, "", href);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        window.history.replaceState(null, '', href);
       } else {
         navigate(href);
       }
@@ -55,139 +70,219 @@ const Header: React.FC = () => {
     }
   };
 
-  const navLinks = (
-    <div className="flex flex-col md:flex-row md:space-x-6">
-      {NAV_LINKS.map((link) => (
-        <Link
-          key={link.to}
-          to={link.to}
-          className={`
-            relative px-3 py-2 text-base font-medium transition-colors
-            ${
-              location.pathname + location.hash === link.to ||
-              (link.sectionId &&
-                location.hash === "#" + link.sectionId &&
-                location.pathname === "/")
-                ? "text-blue-600"
-                : "text-gray-600 hover:text-blue-600"
+  // ✅ Base Navigation Links
+  const NAV_LINKS = [
+    { to: '/', label: 'Home' },
+    { to: '/#upcoming', label: 'Upcoming Auctions', sectionId: 'upcoming' },
+    { to: '/services', label: 'Services' },
+    { to: '/pricing', label: 'Pricing' },
+    { to: '/about', label: 'About Us' },
+    { to: '/contact', label: 'Contact' },
+  ];
+
+  // ✅ Role-based Links
+  if (hasRole('SELLER')) {
+    NAV_LINKS.push(
+      { to: '/seller/dashboard', label: 'Seller Dashboard' },
+      { to: '/seller/auctions', label: 'Manage Auctions' },
+      { to: '/seller/sales', label: 'Sales History' }
+    );
+  }
+
+  if (hasRole('ADMIN')) {
+    NAV_LINKS.push(
+      { to: '/admin/dashboard', label: 'Admin Dashboard' },
+      { to: '/admin/users', label: 'User Management' },
+      { to: '/admin/reports', label: 'Reports' },
+      { to: '/admin/monitoring', label: 'Auction Monitoring' }
+    );
+  }
+
+  const DesktopNav = (
+    <div className="flex items-center space-x-10">
+      {NAV_LINKS.map((link) =>
+        link.label === 'Services' ? (
+          <div
+            key={link.to}
+            className="relative group"
+            onMouseEnter={() => setShowServicesDropdown(true)}
+            onMouseLeave={() => setShowServicesDropdown(false)}
+          >
+            <button
+              className={`flex items-center space-x-1 font-bold text-lg transition-all ${
+                showServicesDropdown ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'
+              }`}
+            >
+              <span>{link.label}</span>
+              <FiChevronDown
+                className={`transition-transform duration-200 ${
+                  showServicesDropdown ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {showServicesDropdown && (
+              <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50">
+                {SERVICE_DROPDOWN.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    onClick={() => setShowServicesDropdown(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            key={link.to}
+            to={link.to}
+            onClick={
+              link.sectionId
+                ? (e) => handleSectionNav(e, link.to, link.sectionId)
+                : () => setIsMobileNav(false)
             }
-          `}
-          tabIndex={isMobileNav ? 0 : undefined}
-          onClick={
-            link.sectionId
-              ? (e) => handleSectionNav(e, link.to, link.sectionId)
-              : () => setIsMobileNav(false)
-          }
-        >
-          {link.label}
-        </Link>
-      ))}
+            className={`font-bold text-lg transition-all ${
+              location.pathname + location.hash === link.to
+                ? 'text-blue-600'
+                : 'text-gray-700 hover:text-blue-600'
+            }`}
+          >
+            {link.label}
+          </Link>
+        )
+      )}
+    </div>
+  );
+
+  const UserMenu = (
+    <div className="relative">
+      <button
+        onClick={() => setShowUserMenu((prev) => !prev)}
+        className="flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
+      >
+        <FiUser className="text-blue-600" />
+        <span className="font-semibold text-gray-800">
+          {user?.username || user?.email}
+        </span>
+        <FiChevronDown
+          className={`text-gray-600 transition-transform duration-200 ${
+            showUserMenu ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
+
+      {showUserMenu && (
+        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50">
+          <Link
+            to="/profile"
+            className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+            onClick={() => setShowUserMenu(false)}
+          >
+            Profile
+          </Link>
+          <Link
+            to="/my-bids"
+            className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+            onClick={() => setShowUserMenu(false)}
+          >
+            My Bids
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700"
+          >
+            <FiLogOut className="inline mr-2" />
+            Logout
+          </button>
+        </div>
+      )}
     </div>
   );
 
   return (
-    <header className="bg-white w-full sticky top-0 z-10 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="AuctionZone logo" className="h-9 w-auto" />
-            <span className="text-xl md:text-2xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              AuctionZone
-            </span>
-          </Link>
+    <header className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center justify-between h-16">
+        {/* Left: Logo */}
+        <Link to="/" className="flex items-center space-x-2">
+          <img src="/logo.png" alt="AuctionZone" className="h-10" />
+          <span className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            AuctionZone
+          </span>
+        </Link>
 
-          <div className="hidden md:flex items-center space-x-4">
-            <nav className="flex space-x-4">{navLinks}</nav>
-            
-            <div
-              className={`
-                relative bg-white rounded-full shadow-sm transition-all duration-300 border border-gray-200
-                ${isSearchActive ? "w-64" : "w-10"}
-              `}
-            >
-              <form onSubmit={handleSearchSubmit}>
+        {/* Center: Navigation */}
+        <nav className="hidden md:block">{DesktopNav}</nav>
+
+        {/* Right: Actions */}
+        <div className="hidden md:flex items-center space-x-5">
+          {/* Search */}
+          <div
+            className={`relative flex items-center transition-all duration-300 ${
+              isSearchActive ? 'w-52 border border-gray-200 rounded-full px-3 py-1' : 'w-10'
+            }`}
+          >
+            <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center">
+              {isSearchActive && (
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="Search..."
-                  aria-label="Search auctions"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`
-                    w-full h-10 pl-10 pr-4 bg-transparent rounded-full outline-none text-sm
-                    transition-opacity duration-300
-                    ${isSearchActive ? "opacity-100" : "opacity-0 pointer-events-none"}
-                  `}
+                  placeholder="Search auctions..."
+                  className="flex-1 outline-none bg-transparent text-sm px-2"
                 />
-              </form>
-              <button
-                type="button"
-                onClick={() => setIsSearchActive((a) => !a)}
-                className="absolute left-0 top-0 h-10 w-10 flex items-center justify-center text-gray-500 hover:text-blue-600"
-                aria-label={isSearchActive ? "Close search" : "Open search"}
-              >
-                <FiSearch size={20} />
-              </button>
-            </div>
-
-            <Link
-              to="/cart"
-              className="relative text-gray-500 hover:text-blue-600 transition-colors"
-              aria-label="Shopping Cart"
+              )}
+            </form>
+            <button
+              onClick={() => setIsSearchActive((prev) => !prev)}
+              className="p-2 text-gray-500 hover:text-blue-600"
             >
-              <FiShoppingCart size={22} />
-            </Link>
-            <Link
-              to="/login"
-              className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm hover:bg-blue-700 transition-all"
-            >
-              <FiUser />
-              <span>Sign In</span>
-            </Link>
+              <FiSearch size={20} />
+            </button>
           </div>
 
-          <button
-            className="inline-flex md:hidden p-2 rounded-full text-blue-600 hover:bg-blue-100 focus:outline-none"
-            onClick={() => setIsMobileNav((v) => !v)}
-            aria-label="Toggle navigation menu"
-            aria-expanded={isMobileNav}
+          {/* Cart */}
+          <Link
+            to="/cart"
+            className="relative text-gray-600 hover:text-blue-600"
+            aria-label="Shopping Cart"
           >
-            <FiMenu size={24} />
-          </button>
-        </div>
-      </div>
-      {isMobileNav && (
-        <nav className="fixed inset-0 bg-black/60 z-40 flex flex-col top-0 left-0 md:hidden transition duration-150">
-          <div className="bg-white p-6 m-3 rounded-lg shadow-xl w-[90vw] max-w-xs">
-            <button
-              className="absolute right-5 top-5 text-gray-600 hover:text-red-600"
-              aria-label="Close menu"
-              onClick={() => setIsMobileNav(false)}
-            >
-              <FiX size={28} />
-            </button>
-            <div className="mt-8 flex flex-col space-y-4">
-                {navLinks}
-            </div>
-            <Link
-              to="/cart"
-              className="block mt-6 text-blue-700"
-              onClick={() => setIsMobileNav(false)}
-            >
-              Cart
-            </Link>
+            <FiShoppingCart size={22} />
+            {cartItems.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {cartItems.length}
+              </span>
+            )}
+          </Link>
+
+          {/* Auth */}
+          {!isAuthenticated ? (
             <Link
               to="/login"
-              className="block mt-2 text-blue-700"
-              onClick={() => setIsMobileNav(false)}
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
             >
               Sign In
             </Link>
-          </div>
-        </nav>
-      )}
+          ) : (
+            UserMenu
+          )}
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden p-2 text-blue-600 hover:bg-blue-100 rounded-full"
+          onClick={() => setIsMobileNav((v) => !v)}
+        >
+          <FiMenu size={26} />
+        </button>
+      </div>
     </header>
   );
 };
 
 export default Header;
+  
